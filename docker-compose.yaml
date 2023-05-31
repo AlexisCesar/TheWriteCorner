@@ -1,0 +1,16 @@
+version: '3.8'
+services:
+  articles_management_db:
+    build: 
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - '27017:27017' 
+    # volumes:
+    #   - db_data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: Articles_Management
+      MONGO_INITDB_ROOT_USERNAME: root1
+      MONGO_INITDB_ROOT_PASSWORD: Database2023
+# volumes:
+#   db_data:
