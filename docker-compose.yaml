@@ -1,16 +1,15 @@
-version: '3.8'
+version: '3.7'
 services:
   articles_management_db:
-    build: 
-      dockerfile: Dockerfile
+    image: mongo:latest
     restart: always
+    volumes:
+      - mongo:/data/db
+      - ./init-articles-management.js:/docker-entrypoint-initdb.d/init-articles.management.js
     ports:
-      - '27017:27017' 
-    # volumes:
-    #   - db_data:/data/db
+      - '27018:27017' 
     environment:
-      MONGO_INITDB_DATABASE: Articles_Management
-      MONGO_INITDB_ROOT_USERNAME: root1
+      MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: Database2023
-# volumes:
-#   db_data:
+volumes:
+  mongo:

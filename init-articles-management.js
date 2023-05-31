@@ -1,4 +1,5 @@
-use Articles_Management
+conn = new Mongo();
+db = conn.getDB("Articles_Management");
 
 db.createCollection("Articles", {
     validator: {
