@@ -11,5 +11,9 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: Database2023
+  articles_api:
+    build: ./ArticlesAPI
+    ports:
+      - '5556:5271'      
 volumes:
   mongo:
