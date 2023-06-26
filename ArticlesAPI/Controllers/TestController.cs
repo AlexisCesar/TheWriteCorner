@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using ArticlesAPI.Services;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ArticlesAPI.Controllers
 {
@@ -6,11 +7,20 @@ namespace ArticlesAPI.Controllers
     [Route("[controller]")]
     public class TestController : ControllerBase
     {
+        private readonly IArticlesService _articlesService;
+
+        public TestController(IArticlesService service)
+        {
+            _articlesService = service;
+        }
+
         [HttpGet(Name = "GetValueFromDatabase")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
-        public IActionResult Get()
+        public async Task<IActionResult> Get()
         {
-            return Ok("Value from database: ...");
+            var result = await _articlesService.GetAsync();
+
+            return Ok(result);
         }
     }
 }
