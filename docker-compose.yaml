@@ -11,14 +11,26 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: Database2023
+    container_name: articles_management_db
+    networks:
+      - articles-net
   articles_api:
     build: ./ArticlesAPI
     ports:
       - '5556:80'
+    container_name: articles_api
+    networks:
+      - articles-net
   broker:
     image: rabbitmq:3.11-management
     ports:
       - 5672:5672
       - 15672:15672
+    container_name: articles_broker
+    networks:
+      - articles-net
 volumes:
   mongo:
+networks:
+  articles-net:
+    driver: bridge
