@@ -1,4 +1,5 @@
 using ArticlesAPI.Models;
+using ArticlesAPI.RabbitMq;
 using ArticlesAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +16,8 @@ builder.Services.Configure<ArticlesManagementDatabaseSettings>(
 );
 
 builder.Services.AddSingleton<IArticlesService, ArticlesService>();
+builder.Services.AddSingleton<IRabbitMqConnection, RabbitMqConnection>();
+builder.Services.AddScoped<IRabbitMqPublisher, RabbitMqPublisher>();
 
 var app = builder.Build();
 
