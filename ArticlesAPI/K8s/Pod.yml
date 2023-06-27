@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: articles-api-pod
+  labels:
+    app: articles-api-pod
+spec:
+  containers:
+    - name: articles-api-pod-container
+      image: articles-api:1
+      ports:
+        - containerPort: 3000
