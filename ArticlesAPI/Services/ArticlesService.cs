@@ -8,8 +8,8 @@ namespace ArticlesAPI.Services
     {
         Task<List<Article>> GetAsync();
         Task<Article?> GetAsync(string id);
-        Task CreateAsync(Article newBook);
-        Task UpdateAsync(string id, Article updatedBook);
+        Task CreateAsync(Article newArticle);
+        Task UpdateAsync(string id, Article updatedArticle);
         Task RemoveAsync(string id);
     }
 
@@ -36,11 +36,11 @@ namespace ArticlesAPI.Services
         public async Task<Article?> GetAsync(string id) =>
             await _articlesCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
 
-        public async Task CreateAsync(Article newBook) =>
-            await _articlesCollection.InsertOneAsync(newBook);
+        public async Task CreateAsync(Article article) =>
+            await _articlesCollection.InsertOneAsync(article);
 
-        public async Task UpdateAsync(string id, Article updatedBook) =>
-            await _articlesCollection.ReplaceOneAsync(x => x.Id == id, updatedBook);
+        public async Task UpdateAsync(string id, Article updatedArticle) =>
+            await _articlesCollection.ReplaceOneAsync(x => x.Id == id, updatedArticle);
 
         public async Task RemoveAsync(string id) =>
             await _articlesCollection.DeleteOneAsync(x => x.Id == id);

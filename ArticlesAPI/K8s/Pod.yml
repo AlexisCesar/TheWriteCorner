@@ -9,4 +9,4 @@ spec:
     - name: articles-api-pod-container
       image: articles-api:1
       ports:
-        - containerPort: 3000
+        - containerPort: 5556
