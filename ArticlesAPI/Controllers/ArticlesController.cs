@@ -2,6 +2,7 @@
 using ArticlesAPI.RabbitMq;
 using ArticlesAPI.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 
 namespace ArticlesAPI.Controllers
 {
@@ -11,6 +12,7 @@ namespace ArticlesAPI.Controllers
     {
         private readonly IArticlesService _articlesService;
         private readonly IRabbitMqPublisher _rabbitMqPublisher;
+        private readonly String exchange = "articlesOperations";
 
         public ArticlesController(IArticlesService service, IRabbitMqPublisher rabbitMqPublisher)
         {
@@ -65,11 +67,12 @@ namespace ArticlesAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreateArticle([FromBody] Article article)
         {
-            if (article == null) return BadRequest();
+            if (article == null) return BadRequest();            
 
             try
             {
                 await _articlesService.CreateAsync(article);
+                _rabbitMqPublisher.PublishMessage(exchange, JsonSerializer.Serialize(article));
                 return Created($"api/v1/articles/{article.Id}", article);
             }
             catch
@@ -90,6 +93,7 @@ namespace ArticlesAPI.Controllers
             try
             {
                 await _articlesService.RemoveAsync(id);
+                _rabbitMqPublisher.PublishMessage(exchange, JsonSerializer.Serialize(new Article() { Id = id}));
                 return NoContent();
             }
             catch
@@ -110,6 +114,7 @@ namespace ArticlesAPI.Controllers
             try
             {
                 await _articlesService.UpdateAsync(id, article);
+                _rabbitMqPublisher.PublishMessage(exchange, JsonSerializer.Serialize(article));
                 return Ok(article);
             }
             catch
