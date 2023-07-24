@@ -1,6 +1,8 @@
+using ArticlesAPI.Mappings;
 using ArticlesAPI.Models;
 using ArticlesAPI.RabbitMq;
 using ArticlesAPI.Services;
+using AutoMapper;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +20,13 @@ builder.Services.Configure<ArticlesManagementDatabaseSettings>(
 builder.Services.AddSingleton<IArticlesService, ArticlesService>();
 builder.Services.AddSingleton<IRabbitMqConnection, RabbitMqConnection>();
 builder.Services.AddScoped<IRabbitMqPublisher, RabbitMqPublisher>();
+
+// Mapping
+var mappingConfig = new MapperConfiguration(cfg => cfg.AddProfile(new MappingProfile()));
+
+IMapper mapper = mappingConfig.CreateMapper();
+
+builder.Services.AddSingleton(mapper);
 
 var app = builder.Build();
 

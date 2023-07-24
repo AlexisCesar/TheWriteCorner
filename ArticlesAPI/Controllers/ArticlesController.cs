@@ -1,7 +1,10 @@
-﻿using ArticlesAPI.Models;
+﻿using ArticlesAPI.DTOs.Command;
+using ArticlesAPI.Models;
 using ArticlesAPI.RabbitMq;
 using ArticlesAPI.Services;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using MongoDB.Bson;
 using System.Text.Json;
 
 namespace ArticlesAPI.Controllers
@@ -10,14 +13,16 @@ namespace ArticlesAPI.Controllers
     [Route("api/v1/articles")]
     public class ArticlesController : ControllerBase
     {
+        private readonly IMapper _mapper;
         private readonly IArticlesService _articlesService;
         private readonly IRabbitMqPublisher _rabbitMqPublisher;
         private readonly String exchange = "articlesOperations";
 
-        public ArticlesController(IArticlesService service, IRabbitMqPublisher rabbitMqPublisher)
+        public ArticlesController(IArticlesService service, IRabbitMqPublisher rabbitMqPublisher, IMapper mapper)
         {
             _articlesService = service;
             _rabbitMqPublisher = rabbitMqPublisher;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -42,38 +47,46 @@ namespace ArticlesAPI.Controllers
         [HttpGet]
         [Route(template: "{id}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetArticleById([FromRoute] string id)
         {
-            if (string.IsNullOrEmpty(id)) return BadRequest();
-
-            Article? result;
-            try
+            if (ObjectId.TryParse(id, out _) && !string.IsNullOrEmpty(id))
             {
-                result = await _articlesService.GetAsync(id);
+                Article? result;
+                try
+                {
+                    result = await _articlesService.GetAsync(id);
+                }
+                catch
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, "Something went wrong with our database, please try again later.");
+                }
+
+                return result == null ? NotFound("We could not find this article in our database") : Ok(result) ;
             }
-            catch
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Something went wrong with our database, please try again later.");
-            }        
 
-            return result == null ? NotFound("We could not find this article in our database") : Ok(result) ;
+            return BadRequest("Invalid ID");
         }
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> CreateArticle([FromBody] Article article)
+        public async Task<IActionResult> CreateArticle([FromBody] CreateArticleCommand article)
         {
             if (article == null) return BadRequest();            
 
             try
             {
-                await _articlesService.CreateAsync(article);
-                _rabbitMqPublisher.PublishMessage(exchange, JsonSerializer.Serialize(article));
-                return Created($"api/v1/articles/{article.Id}", article);
+                var newArticle = _mapper.Map<Article>(article);
+
+                await _articlesService.CreateAsync(newArticle);
+
+                _rabbitMqPublisher.PublishMessage(exchange, JsonSerializer.Serialize(newArticle));
+
+                return Created($"api/v1/articles/{newArticle.Id}", newArticle);
             }
             catch
             {
@@ -88,39 +101,56 @@ namespace ArticlesAPI.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> DeleteArticle([FromRoute] string id)
         {
-            if (string.IsNullOrEmpty(id)) return BadRequest();
+            if (ObjectId.TryParse(id, out _) && !string.IsNullOrEmpty(id))
+            {
+                try
+                {
+                    await _articlesService.RemoveAsync(id);
 
-            try
-            {
-                await _articlesService.RemoveAsync(id);
-                _rabbitMqPublisher.PublishMessage(exchange, JsonSerializer.Serialize(new Article() { Id = id}));
-                return NoContent();
+                    _rabbitMqPublisher.PublishMessage(exchange, JsonSerializer.Serialize(new Article() { Id = id}));
+
+                    return NoContent();
+                }
+                catch
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, "Something went wrong with our database, please try again later.");
+                }
             }
-            catch
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Something went wrong with our database, please try again later.");
-            }
+
+            return BadRequest("Invalid ID");
         }
 
         [HttpPut]
         [Route(template: "{id}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UpdateArticle([FromRoute] string id, [FromBody] Article article)
+        public async Task<IActionResult> UpdateArticle([FromRoute] string id, [FromBody] UpdateArticleCommand article)
         {
-            if (string.IsNullOrEmpty(id) || article == null) return BadRequest();
+            if (ObjectId.TryParse(id, out _) && !string.IsNullOrEmpty(id))
+            {
+                try
+                {
+                    var articleInDatabase = await _articlesService.GetAsync(id);
 
-            try
-            {
-                await _articlesService.UpdateAsync(id, article);
-                _rabbitMqPublisher.PublishMessage(exchange, JsonSerializer.Serialize(article));
-                return Ok(article);
+                    if (articleInDatabase == null) return NotFound("An article with this ID was not found.");
+
+                    var articleToUpdate = _mapper.Map<Article>(article);
+
+                    await _articlesService.UpdateAsync(id, articleToUpdate);
+
+                    _rabbitMqPublisher.PublishMessage(exchange, JsonSerializer.Serialize(article));
+
+                    return Ok(article);
+                }
+                catch
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, "Something went wrong with our database, please try again later.");
+                }
             }
-            catch
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Something went wrong with our database, please try again later.");
-            }
+
+            return BadRequest("Invalid ID");
         }
     }
 }
