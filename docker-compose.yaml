@@ -21,6 +21,8 @@ services:
     container_name: articles_api
     networks:
       - articles-net
+    volumes:
+      - ./ArticlesAPI/logs:/app/logs
   broker:
     image: rabbitmq:3.11-management
     ports:
