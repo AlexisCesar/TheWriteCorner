@@ -3,6 +3,7 @@ using ArticlesAPI.Models;
 using ArticlesAPI.RabbitMq;
 using ArticlesAPI.Services;
 using AutoMapper;
+using FluentValidation;
 using log4net;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
@@ -19,13 +20,21 @@ namespace ArticlesAPI.Controllers
         private readonly IRabbitMqPublisher _rabbitMqPublisher;
         private readonly String exchange = "articlesOperations";
 
+        private readonly IValidator<Article> _articleValidator;
+
         private static readonly ILog _logger = LogManager.GetLogger(typeof(ArticlesController));
 
-        public ArticlesController(IArticlesService service, IRabbitMqPublisher rabbitMqPublisher, IMapper mapper)
+        public ArticlesController(
+            IArticlesService service,
+            IRabbitMqPublisher rabbitMqPublisher,
+            IMapper mapper,
+            IValidator<Article> articleValidator
+        )
         {
             _articlesService = service;
             _rabbitMqPublisher = rabbitMqPublisher;
             _mapper = mapper;
+            _articleValidator = articleValidator;
         }
 
         [HttpGet]
@@ -87,6 +96,13 @@ namespace ArticlesAPI.Controllers
             {
                 var newArticle = _mapper.Map<Article>(article);
 
+                var validationResult = _articleValidator.Validate(newArticle);
+
+                if (!validationResult.IsValid)
+                {
+                    return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
+                } 
+
                 await _articlesService.CreateAsync(newArticle);
 
                 _rabbitMqPublisher.PublishMessage(exchange, JsonSerializer.Serialize(newArticle));
@@ -144,6 +160,13 @@ namespace ArticlesAPI.Controllers
                     if (articleInDatabase == null) return NotFound("An article with this ID was not found.");
 
                     var articleToUpdate = _mapper.Map<Article>(article);
+
+                    var validationResult = _articleValidator.Validate(articleToUpdate);
+
+                    if (!validationResult.IsValid)
+                    {
+                        return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
+                    }
 
                     await _articlesService.UpdateAsync(id, articleToUpdate);
 

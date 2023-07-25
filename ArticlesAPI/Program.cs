@@ -1,8 +1,11 @@
+using ArticlesAPI.DTOs.Command;
 using ArticlesAPI.Mappings;
 using ArticlesAPI.Models;
 using ArticlesAPI.RabbitMq;
 using ArticlesAPI.Services;
+using ArticlesAPI.Validators;
 using AutoMapper;
+using FluentValidation;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +24,9 @@ builder.Services.AddSingleton<IArticlesService, ArticlesService>();
 builder.Services.AddSingleton<IRabbitMqConnection, RabbitMqConnection>();
 builder.Services.AddScoped<IRabbitMqPublisher, RabbitMqPublisher>();
 
+// Validators
+builder.Services.AddScoped<IValidator<Article>, ArticleValidator>();
+
 // Mapping
 var mappingConfig = new MapperConfiguration(cfg => cfg.AddProfile(new MappingProfile()));
 
@@ -30,6 +36,7 @@ builder.Services.AddSingleton(mapper);
 
 // Logger
 builder.Logging.AddLog4Net();
+
 
 var app = builder.Build();
 
