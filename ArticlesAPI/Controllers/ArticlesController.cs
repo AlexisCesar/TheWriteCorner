@@ -3,6 +3,7 @@ using ArticlesAPI.Models;
 using ArticlesAPI.RabbitMq;
 using ArticlesAPI.Services;
 using AutoMapper;
+using log4net;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using System.Text.Json;
@@ -17,6 +18,8 @@ namespace ArticlesAPI.Controllers
         private readonly IArticlesService _articlesService;
         private readonly IRabbitMqPublisher _rabbitMqPublisher;
         private readonly String exchange = "articlesOperations";
+
+        private static readonly ILog _logger = LogManager.GetLogger(typeof(ArticlesController));
 
         public ArticlesController(IArticlesService service, IRabbitMqPublisher rabbitMqPublisher, IMapper mapper)
         {
@@ -36,8 +39,9 @@ namespace ArticlesAPI.Controllers
             {
                 result = await _articlesService.GetAsync();
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.Error(ex);
                 return StatusCode(StatusCodes.Status500InternalServerError, "Something went wrong with our database, please try again later.");
             }
             
@@ -59,8 +63,9 @@ namespace ArticlesAPI.Controllers
                 {
                     result = await _articlesService.GetAsync(id);
                 }
-                catch
+                catch (Exception ex)
                 {
+                    _logger.Error(ex);
                     return StatusCode(StatusCodes.Status500InternalServerError, "Something went wrong with our database, please try again later.");
                 }
 
@@ -88,8 +93,9 @@ namespace ArticlesAPI.Controllers
 
                 return Created($"api/v1/articles/{newArticle.Id}", newArticle);
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.Error(ex);
                 return StatusCode(StatusCodes.Status500InternalServerError, "Something went wrong with our database, please try again later.");
             }
         }
@@ -111,8 +117,9 @@ namespace ArticlesAPI.Controllers
 
                     return NoContent();
                 }
-                catch
+                catch (Exception ex)
                 {
+                    _logger.Error(ex);
                     return StatusCode(StatusCodes.Status500InternalServerError, "Something went wrong with our database, please try again later.");
                 }
             }
@@ -144,8 +151,9 @@ namespace ArticlesAPI.Controllers
 
                     return Ok(article);
                 }
-                catch
+                catch (Exception ex)
                 {
+                    _logger.Error(ex);
                     return StatusCode(StatusCodes.Status500InternalServerError, "Something went wrong with our database, please try again later.");
                 }
             }
