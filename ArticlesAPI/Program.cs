@@ -38,7 +38,6 @@ builder.Services.AddSingleton(mapper);
 // Logger
 builder.Logging.AddLog4Net();
 
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
