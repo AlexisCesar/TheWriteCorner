@@ -21,20 +21,22 @@ namespace ArticlesAPI.Controllers
         private readonly String exchange = "articlesOperations";
 
         private readonly IValidator<Article> _articleValidator;
-
+        private readonly IValidator<Comment> _commentValidator;
         private static readonly ILog _logger = LogManager.GetLogger(typeof(ArticlesController));
 
         public ArticlesController(
             IArticlesService service,
             IRabbitMqPublisher rabbitMqPublisher,
             IMapper mapper,
-            IValidator<Article> articleValidator
+            IValidator<Article> articleValidator,
+            IValidator<Comment> commentValidator
         )
         {
             _articlesService = service;
             _rabbitMqPublisher = rabbitMqPublisher;
             _mapper = mapper;
             _articleValidator = articleValidator;
+            _commentValidator = commentValidator;
         }
 
         [HttpGet]
@@ -173,6 +175,112 @@ namespace ArticlesAPI.Controllers
                     _rabbitMqPublisher.PublishMessage(exchange, JsonSerializer.Serialize(article));
 
                     return Ok(article);
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex);
+                    return StatusCode(StatusCodes.Status500InternalServerError, "Something went wrong with our database, please try again later.");
+                }
+            }
+
+            return BadRequest("Invalid ID");
+        }
+
+        [HttpPost]
+        [Route(template: "{id}/like")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> LikeArticle([FromRoute] string id)
+        {
+            if (ObjectId.TryParse(id, out _) && !string.IsNullOrEmpty(id))
+            {
+                try
+                {
+                    var article = await _articlesService.GetAsync(id);
+
+                    if (article == null) return NotFound("An article with this ID was not found.");
+
+                    article.LikeCount++;
+
+                    await _articlesService.UpdateAsync(id, article);
+
+                    _rabbitMqPublisher.PublishMessage(exchange, JsonSerializer.Serialize(article));
+
+                    return Ok();
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex);
+                    return StatusCode(StatusCodes.Status500InternalServerError, "Something went wrong with our database, please try again later.");
+                }
+            }
+
+            return BadRequest("Invalid ID");
+        }
+
+        [HttpPost]
+        [Route(template: "{id}/dislike")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> DislikeArticle([FromRoute] string id)
+        {
+            if (ObjectId.TryParse(id, out _) && !string.IsNullOrEmpty(id))
+            {
+                try
+                {
+                    var article = await _articlesService.GetAsync(id);
+
+                    if (article == null) return NotFound("An article with this ID was not found.");
+
+                    if (article.LikeCount != 0)
+                    {
+                        article.LikeCount--;
+                        await _articlesService.UpdateAsync(id, article);
+                        _rabbitMqPublisher.PublishMessage(exchange, JsonSerializer.Serialize(article));
+                    }
+
+                    return Ok();
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex);
+                    return StatusCode(StatusCodes.Status500InternalServerError, "Something went wrong with our database, please try again later.");
+                }
+            }
+
+            return BadRequest("Invalid ID");
+        }
+
+        [HttpPost]
+        [Route(template: "{id}/addComment")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> AddComment([FromRoute] string id, [FromBody] Comment comment)
+        {
+            if (ObjectId.TryParse(id, out _) && !string.IsNullOrEmpty(id))
+            {
+                try
+                {
+                    var article = await _articlesService.GetAsync(id);
+
+                    if (article == null) return NotFound("An article with this ID was not found.");
+
+                    var validationResult = _commentValidator.Validate(comment);
+                    if (!validationResult.IsValid) return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
+
+                    article.Comments = article.Comments.Append(comment);
+
+                    await _articlesService.UpdateAsync(id, article);
+
+                    _rabbitMqPublisher.PublishMessage(exchange, JsonSerializer.Serialize(article));
+
+                    return Ok();
                 }
                 catch (Exception ex)
                 {

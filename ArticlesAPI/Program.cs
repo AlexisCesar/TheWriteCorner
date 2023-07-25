@@ -26,6 +26,7 @@ builder.Services.AddScoped<IRabbitMqPublisher, RabbitMqPublisher>();
 
 // Validators
 builder.Services.AddScoped<IValidator<Article>, ArticleValidator>();
+builder.Services.AddScoped<IValidator<Comment>, CommentValidator>();
 
 // Mapping
 var mappingConfig = new MapperConfiguration(cfg => cfg.AddProfile(new MappingProfile()));
