@@ -10,6 +10,7 @@ namespace ArticlesAPI.Mappings
         {
             CreateMap<CreateArticleCommand, Article>();
             CreateMap<UpdateArticleCommand, Article>();
+            CreateMap<CreateCommentCommand, Comment>();
         }
     }
 }

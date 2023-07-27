@@ -1,15 +1,18 @@
-﻿using MongoDB.Bson;
+using System.Text.Json.Serialization;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace ArticlesAPI.Models
+namespace ArticlesAPI.DTOs.Command
 {
-    public class Comment
+    public class CreateCommentCommand
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
+        [JsonIgnore]
         public string? Id { get; set; }
         public string? Author { get; set; }
         [BsonElement("Text")]
         public string? Content { get; set; }
     }
 }
+

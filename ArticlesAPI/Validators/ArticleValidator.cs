@@ -8,6 +8,7 @@ namespace ArticlesAPI.Validators
         public ArticleValidator()
         {
             RuleFor(x => x.Title).NotEmpty();
+            RuleFor(x => x.Content).NotEmpty();
             RuleFor(x => x.Abstract).NotEmpty();
             RuleFor(x => x.PublicationDate).NotEmpty();
             RuleFor(x => x.Authors).NotEmpty().WithMessage("There must be at least one author.");

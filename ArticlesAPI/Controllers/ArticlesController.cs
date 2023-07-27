@@ -55,8 +55,8 @@ namespace ArticlesAPI.Controllers
                 _logger.Error(ex);
                 return StatusCode(StatusCodes.Status500InternalServerError, "Something went wrong with our database, please try again later.");
             }
-            
-            return result.Count() == 0 ? NoContent() : Ok(result);         
+
+            return result.Count() == 0 ? NoContent() : Ok(result);
         }
 
         [HttpGet]
@@ -80,7 +80,7 @@ namespace ArticlesAPI.Controllers
                     return StatusCode(StatusCodes.Status500InternalServerError, "Something went wrong with our database, please try again later.");
                 }
 
-                return result == null ? NotFound("We could not find this article in our database") : Ok(result) ;
+                return result == null ? NotFound("We could not find this article in our database") : Ok(result);
             }
 
             return BadRequest("Invalid ID");
@@ -92,7 +92,7 @@ namespace ArticlesAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreateArticle([FromBody] CreateArticleCommand article)
         {
-            if (article == null) return BadRequest();            
+            if (article == null) return BadRequest();
 
             try
             {
@@ -103,7 +103,7 @@ namespace ArticlesAPI.Controllers
                 if (!validationResult.IsValid)
                 {
                     return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
-                } 
+                }
 
                 await _articlesService.CreateAsync(newArticle);
 
@@ -119,7 +119,7 @@ namespace ArticlesAPI.Controllers
         }
 
         [HttpDelete]
-        [Route(template: "{id}")]  
+        [Route(template: "{id}")]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -129,9 +129,13 @@ namespace ArticlesAPI.Controllers
             {
                 try
                 {
+                    var articleInDatabase = await _articlesService.GetAsync(id);
+
+                    if (articleInDatabase == null) return NotFound("An article with this ID was not found.");
+
                     await _articlesService.RemoveAsync(id);
 
-                    _rabbitMqPublisher.PublishMessage(exchange, JsonSerializer.Serialize(new Article() { Id = id}));
+                    _rabbitMqPublisher.PublishMessage(exchange, JsonSerializer.Serialize(new Article() { Id = id }));
 
                     return NoContent();
                 }
@@ -261,7 +265,7 @@ namespace ArticlesAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> AddComment([FromRoute] string id, [FromBody] Comment comment)
+        public async Task<IActionResult> AddComment([FromRoute] string id, [FromBody] CreateCommentCommand comment)
         {
             if (ObjectId.TryParse(id, out _) && !string.IsNullOrEmpty(id))
             {
@@ -271,10 +275,14 @@ namespace ArticlesAPI.Controllers
 
                     if (article == null) return NotFound("An article with this ID was not found.");
 
-                    var validationResult = _commentValidator.Validate(comment);
+                    comment.Id = ObjectId.GenerateNewId().ToString();
+
+                    var commentToAdd = _mapper.Map<Comment>(comment);
+
+                    var validationResult = _commentValidator.Validate(commentToAdd);
                     if (!validationResult.IsValid) return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
 
-                    article.Comments = article.Comments.Append(comment);
+                    article.Comments = article.Comments.Append(commentToAdd);
 
                     await _articlesService.UpdateAsync(id, article);
 
@@ -290,6 +298,49 @@ namespace ArticlesAPI.Controllers
             }
 
             return BadRequest("Invalid ID");
+        }
+
+        [HttpPost]
+        [Route(template: "{articleId}/deleteComment/{commentId}")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> DeleteComment([FromRoute] string articleId, [FromRoute] string commentId)
+        {
+            if (ObjectId.TryParse(articleId, out _) && !string.IsNullOrEmpty(articleId))
+            {
+
+                if (ObjectId.TryParse(commentId, out _) && !string.IsNullOrEmpty(commentId))
+                {
+
+                    try
+                    {
+                        var article = await _articlesService.GetAsync(articleId);
+
+                        if (article == null) return NotFound("An article with this ID was not found.");
+
+                        var comment = article.Comments.FirstOrDefault(x => x.Id == commentId);
+
+                        if (comment == null) return NotFound("A comment with this ID was not found.");
+
+                        article.Comments = article.Comments.Where(x => x != comment);
+
+                        await _articlesService.UpdateAsync(articleId, article);
+
+                        return NoContent();
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.Error(ex);
+                        return StatusCode(StatusCodes.Status500InternalServerError, "Something went wrong with our database, please try again later.");
+                    }
+                }
+
+                return BadRequest("Invalid commentId.");
+            }
+
+            return BadRequest("Invalid articleId.");
         }
     }
 }
