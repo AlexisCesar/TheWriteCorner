@@ -1,4 +1,3 @@
-using ArticlesAPI.DTOs.Command;
 using ArticlesAPI.Mappings;
 using ArticlesAPI.Models;
 using ArticlesAPI.RabbitMq;
