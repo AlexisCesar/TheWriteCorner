@@ -300,7 +300,7 @@ namespace ArticlesAPI.Controllers
             return BadRequest("Invalid ID");
         }
 
-        [HttpPost]
+        [HttpDelete]
         [Route(template: "{articleId}/deleteComment/{commentId}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
