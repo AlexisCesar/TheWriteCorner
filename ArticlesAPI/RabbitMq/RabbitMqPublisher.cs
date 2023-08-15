@@ -23,7 +23,7 @@ namespace ArticlesAPI.RabbitMq
                channel.ExchangeDeclare(exchange: exchange,
                                         type: "fanout",
                                         durable: true,
-                                        autoDelete: false);           
+                                        autoDelete: false);
 
                 var body = Encoding.UTF8.GetBytes(message);
 
