@@ -13,10 +13,13 @@ class Program
         var rabbitMqConnection = new RabbitMqConnection(configuration);
         var rabbitMqConsumer = new RabbitMqConsumer(rabbitMqConnection);
 
-        Console.WriteLine("Starting consumer");
+        Console.WriteLine("Initializing consumer...");
 
         rabbitMqConsumer.RabbitMqStartConsumer("updateArticle", "articlesOperations");
 
-        Console.WriteLine("Ending application");    
+        Console.WriteLine("Listening RabbitMQ queue");
+
+        Console.ReadLine();
+        Console.WriteLine("Ending application");
     }
 }
