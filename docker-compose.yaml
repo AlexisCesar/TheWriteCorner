@@ -1,5 +1,15 @@
 version: '3.7'
 services:
+  portainer:
+    image: portainer/portainer-ce:latest
+    restart: always
+    container_name: portainer
+    ports:
+      - '8000:8000'
+      - '9443:9000'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
   articles_management_db:
     image: mongo:latest
     restart: always
@@ -40,6 +50,7 @@ services:
     tty: true
 volumes:
   mongo:
+  portainer_data:
 networks:
   articles-net:
     driver: bridge
