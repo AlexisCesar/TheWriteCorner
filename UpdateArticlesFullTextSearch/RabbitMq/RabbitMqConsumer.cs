@@ -4,10 +4,6 @@ using System.Text;
 
 namespace UpdateArticlesFullTextSearch.RabbitMq
 {
-    public interface IRabbitMqPublisher
-    {
-        void PublishMessage(string exchange, string message);
-    }
     public class RabbitMqConsumer
     {
 
@@ -17,12 +13,12 @@ namespace UpdateArticlesFullTextSearch.RabbitMq
             _rabbitMqConnection = rabbitMqConnection;
         }
 
-        public void RabbitMqStartConsumer(string queueName, string exchange) 
+        public void RabbitMqStartConsumer(string queueName, string exchange, string routingKey) 
         {
             var channel = _rabbitMqConnection.CreateChannel();
             
             channel.ExchangeDeclare(exchange: exchange,
-                                    type: ExchangeType.Fanout,
+                                    type: ExchangeType.Topic,
                                     durable: true,
                                     autoDelete: false);
 
@@ -30,7 +26,7 @@ namespace UpdateArticlesFullTextSearch.RabbitMq
 
             channel.QueueBind(queue: queueName,
                                 exchange: exchange,
-                                routingKey: string.Empty);
+                                routingKey: routingKey);
 
             var consumer = new EventingBasicConsumer(channel);
 

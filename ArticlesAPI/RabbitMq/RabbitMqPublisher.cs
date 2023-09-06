@@ -5,7 +5,7 @@ namespace ArticlesAPI.RabbitMq
 {
     public interface IRabbitMqPublisher 
     {
-        void PublishMessage(string exchange, string message);
+        void PublishMessage(string exchange, string message, string routingKey);
     }
 
     public class RabbitMqPublisher : IRabbitMqPublisher
@@ -16,19 +16,19 @@ namespace ArticlesAPI.RabbitMq
             _rabbitMqConnection = rabbitMqConnection;
         }
 
-        public void PublishMessage(string exchange, string message) 
+        public void PublishMessage(string exchange, string message, string routingKey) 
         {
             using (var channel = _rabbitMqConnection.CreateChannel())
             {
                channel.ExchangeDeclare(exchange: exchange,
-                                        type: "fanout",
+                                        type: "topic",
                                         durable: true,
                                         autoDelete: false);
 
                 var body = Encoding.UTF8.GetBytes(message);
 
                 channel.BasicPublish(exchange: exchange,
-                                     routingKey: string.Empty,
+                                     routingKey: routingKey,
                                      basicProperties: null,
                                      body: body);
             }
