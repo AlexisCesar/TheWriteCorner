@@ -77,6 +77,7 @@ db.createCollection("Articles", {
 });
 
 db.Articles.insertMany([{
+    _id: ObjectId("64ffa47a0d9e8e1092db0dd5"),
     "Title": "A IMPORTÂNCIA DO TEOREMA FUNDAMENTAL DA ARITMÉTICA NA CRIPTOGRAFIA DE CHAVE PÚBLICA",
     "Abstract": "O presente trabalho teve como objetivo apresentar a importância da aplicabilidadedo teorema fundamental da aritmética na criptografia de chave pública, no qual seupapel é imprescindível na segurança da informação devido a dificuldade em decompornúmeroscompostosem fatores primos. Para isso,o estudo baseou-se emrevisões bibliográficas com demonstrações matemáticas do postuladoe da infinitude dos números primos, bem como um algoritmo desenvolvido pelos autores que realiza a fatoração de doisnúmeros distintos em suas quantidades de bits, evidenciandoassim,que tal operação computacional é onerosae não determinística. Nesse sentido, a pesquisa apresentaempiricamenteatravés de experimentos e demonstrações,o quão laborioso seria atentativa de obtenção inapropriada dos dadoscriptografados utilizando o algoritmo de chave assimétrica, salientando que, a computação une-se àmatemática para garantir a impraticabilidade nadecriptação de uma chave pública, garantindo dessa forma, a segurança e a integridade da informaçãono mundo digital.",
     "Authors": ["Bruna Gonçalves"],
