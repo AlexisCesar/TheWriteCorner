@@ -1,7 +1,7 @@
 ﻿using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson;
 
-namespace ArticlesAPI.Models
+namespace UpdateArticlesFullTextSearch.Models
 {
     public class Article
     {
