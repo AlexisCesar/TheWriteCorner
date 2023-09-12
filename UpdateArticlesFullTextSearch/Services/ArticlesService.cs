@@ -6,8 +6,6 @@ namespace UpdateArticlesFullTextSearch.Services
 {
     public interface IArticlesService
     {
-        Task<List<Article>> GetAsync();
-        Task<Article?> GetAsync(string id);
         Task CreateAsync(Article newArticle);
         Task UpdateAsync(string id, Article updatedArticle);
         Task RemoveAsync(string id);
@@ -29,12 +27,6 @@ namespace UpdateArticlesFullTextSearch.Services
             _articlesCollection = mongoDatabase.GetCollection<Article>(
                 mongoConfig["ArticlesCollectionName"]);
         }
-
-        public async Task<List<Article>> GetAsync() =>
-            await _articlesCollection.Find(_ => true).ToListAsync();
-
-        public async Task<Article?> GetAsync(string id) =>
-            await _articlesCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
 
         public async Task CreateAsync(Article article) =>
             await _articlesCollection.InsertOneAsync(article);
