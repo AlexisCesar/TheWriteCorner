@@ -50,6 +50,15 @@ services:
     depends_on:
       broker:
         condition: service_healthy  
+  articles_search:
+    build: ./ArticlesSearchAPI
+    ports:
+      - '7776:80'
+    container_name: articles_search
+    networks:
+      - articles-net
+    volumes:
+      - ./ArticlesSearchAPI/logs:/app/logs
   broker:
     image: rabbitmq:3.11-management
     ports:
