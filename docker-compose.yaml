@@ -86,6 +86,19 @@ services:
         condition: service_healthy
     volumes:
       - ./UpdateArticlesFullTextSearch/logs:/app/logs
+  auth_db:
+    image: mysql
+    restart: always
+    ports:
+      - '3306:3306'
+    container_name: auth_db
+    volumes:
+      - authdb:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: 'articles_auth'
+      MYSQL_ROOT_PASSWORD: root
+    networks:
+      - auth-network
 volumes:
   mongoManagement:
   mongoSearch:
@@ -97,4 +110,6 @@ networks:
   articles-search-network:
     driver: bridge
   messaging-network:
+    driver: bridge
+  auth-network:
     driver: bridge
