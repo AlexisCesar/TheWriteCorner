@@ -99,6 +99,15 @@ services:
       MYSQL_ROOT_PASSWORD: root
     networks:
       - auth-network
+  auth_api:
+    build: ./AuthAPI
+    ports:
+      - '4442:80'
+    container_name: auth_api
+    networks:
+      - auth-network
+    volumes:
+      - ./AuthAPI/logs:/app/logs
 volumes:
   mongoManagement:
   mongoSearch:
