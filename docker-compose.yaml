@@ -23,7 +23,7 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: Database2023
     container_name: articles_management_db
     networks:
-      - articles-net
+      - articles-management-network
   articles_search_db:
     image: mongo:latest
     restart: always
@@ -37,14 +37,15 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: Database2023
     container_name: articles_search_db
     networks:
-      - articles-net
+      - articles-search-network
   articles_api:
     build: ./ArticlesAPI
     ports:
       - '5556:80'
     container_name: articles_api
     networks:
-      - articles-net
+      - articles-management-network
+      - messaging-network
     volumes:
       - ./ArticlesAPI/logs:/app/logs
     depends_on:
@@ -56,7 +57,7 @@ services:
       - '7776:80'
     container_name: articles_search
     networks:
-      - articles-net
+      - articles-search-network
     volumes:
       - ./ArticlesSearchAPI/logs:/app/logs
   broker:
@@ -71,12 +72,13 @@ services:
         timeout: 30s
         retries: 3
     networks:
-      - articles-net
+      - messaging-network
   update_articles_full_text_search:
     build: ./UpdateArticlesFullTextSearch   
     container_name: update_articles_full_text_search
     networks:
-      - articles-net
+      - messaging-network
+      - articles-search-network
     stdin_open: true
     tty: true  
     depends_on:
@@ -88,6 +90,11 @@ volumes:
   mongoManagement:
   mongoSearch:
   portainer_data:
+  authdb:
 networks:
-  articles-net:
+  articles-management-network:
+    driver: bridge
+  articles-search-network:
+    driver: bridge
+  messaging-network:
     driver: bridge
