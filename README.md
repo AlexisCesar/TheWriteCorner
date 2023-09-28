@@ -8,4 +8,4 @@
 - *✉️ RabbitMQ Message broker*.
 
 Architecture Diagram:
-![arquitetura-pdi drawio (3)](https://user-images.githubusercontent.com/42656077/234144111-6d801136-6f45-4d67-ba07-92d45eadc19d.png)
+![thewritecorner drawio](https://github.com/AlexisCesar/TheWriteCorner/assets/42656077/e0817a72-f648-4114-9ee5-2af6482348d1)
