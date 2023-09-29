@@ -90,7 +90,7 @@ services:
     image: mysql
     restart: always
     ports:
-      - '3306:3306'
+      - '3307:3306'
     container_name: auth_db
     volumes:
       - authdb:/var/lib/mysql
