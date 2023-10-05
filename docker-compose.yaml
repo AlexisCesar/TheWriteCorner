@@ -108,6 +108,8 @@ services:
       - auth-network
     volumes:
       - ./AuthAPI/logs:/app/logs
+    depends_on:
+      - auth_db
 volumes:
   mongoManagement:
   mongoSearch:
