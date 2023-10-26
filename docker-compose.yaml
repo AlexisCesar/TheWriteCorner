@@ -86,23 +86,11 @@ services:
         condition: service_healthy
     volumes:
       - ./UpdateArticlesFullTextSearch/logs:/app/logs
-  send_article_notification:
-    build: ./SendArticleNotification
-    container_name: send_article_notification
-    networks:
-      - messaging-network
-    stdin_open: true
-    tty: true
-    depends_on:
-      broker:
-        condition: service_healthy
-    volumes:
-      - ./SendArticleNotification/logs:/app/logs
   auth_db:
     image: mysql
     restart: always
     ports:
-      - '3307:3306'
+      - '3309:3306'
     container_name: auth_db
     volumes:
       - authdb:/var/lib/mysql
@@ -118,15 +106,44 @@ services:
     container_name: auth_api
     networks:
       - auth-network
+      - messaging-network
     volumes:
       - ./AuthAPI/logs:/app/logs
     depends_on:
       - auth_db
+      - broker
+  send_article_notification:
+    build: ./SendArticleNotification
+    container_name: send_article_notification
+    networks:
+      - messaging-network
+      - notification-network
+    stdin_open: true
+    tty: true
+    depends_on:
+      broker:
+        condition: service_healthy
+    volumes:
+      - ./SendArticleNotification/logs:/app/logs
+  notification_db:
+    image: mysql
+    restart: always
+    ports:
+      - '3308:3306'
+    container_name: notification_db
+    volumes:
+      - notificationdb:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: 'articles_notification'
+      MYSQL_ROOT_PASSWORD: root
+    networks:
+      - notification-network
 volumes:
   mongoManagement:
   mongoSearch:
   portainer_data:
   authdb:
+  notificationdb:
 networks:
   articles-management-network:
     driver: bridge
@@ -135,4 +152,6 @@ networks:
   messaging-network:
     driver: bridge
   auth-network:
+    driver: bridge
+  notification-network:
     driver: bridge

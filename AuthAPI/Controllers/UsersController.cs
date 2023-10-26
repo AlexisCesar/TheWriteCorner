@@ -1,4 +1,6 @@
+using System.Text.Json;
 using AuthAPI.Data.DTOs;
+using AuthAPI.RabbitMq;
 using AuthAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,11 +12,14 @@ namespace AuthAPI.Controllers
     {
         private readonly ILogger<UsersController> _logger;
         private readonly UserService _userService;
+        private readonly IRabbitMqPublisher _rabbitMqPublisher;
+        private readonly string Exchange = "usersOperations";
 
-        public UsersController(ILogger<UsersController> logger, UserService userService)
+        public UsersController(ILogger<UsersController> logger, UserService userService, IRabbitMqPublisher rabbitMqPublisher)
         {
             _logger = logger;
             _userService = userService;
+            _rabbitMqPublisher = rabbitMqPublisher;
         }
 
         [HttpPost("register")]
@@ -22,6 +27,8 @@ namespace AuthAPI.Controllers
              (CreateUserDto dto)
         {
             await _userService.CadastraUsuario(dto);
+            _rabbitMqPublisher.PublishMessage(Exchange, dto.EmailAddress, "email.registered");
+
             return Ok("User registered!");
 
         }
