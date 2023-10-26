@@ -18,7 +18,7 @@ namespace ArticlesAPI.Controllers
         private readonly IMapper _mapper;
         private readonly IArticlesService _articlesService;
         private readonly IRabbitMqPublisher _rabbitMqPublisher;
-        private readonly String exchange = "articlesOperations";
+        private readonly string Exchange = "articlesOperations";
 
         private readonly IValidator<Article> _articleValidator;
         private readonly IValidator<Comment> _commentValidator;
@@ -107,7 +107,7 @@ namespace ArticlesAPI.Controllers
 
                 await _articlesService.CreateAsync(newArticle);
 
-                _rabbitMqPublisher.PublishMessage(exchange, JsonSerializer.Serialize(newArticle), "create.notify");
+                _rabbitMqPublisher.PublishMessage(Exchange, JsonSerializer.Serialize(newArticle), "create.notify");
 
                 return Created($"api/v1/articles/{newArticle.Id}", newArticle);
             }
@@ -135,7 +135,7 @@ namespace ArticlesAPI.Controllers
 
                     await _articlesService.RemoveAsync(id);
 
-                    _rabbitMqPublisher.PublishMessage(exchange, JsonSerializer.Serialize(new Article() { Id = id }), "delete");
+                    _rabbitMqPublisher.PublishMessage(Exchange, JsonSerializer.Serialize(new Article() { Id = id }), "delete");
 
                     return NoContent();
                 }
@@ -176,7 +176,7 @@ namespace ArticlesAPI.Controllers
 
                     await _articlesService.UpdateAsync(id, articleToUpdate);
 
-                    _rabbitMqPublisher.PublishMessage(exchange, JsonSerializer.Serialize(article), "update.notify");
+                    _rabbitMqPublisher.PublishMessage(Exchange, JsonSerializer.Serialize(article), "update.notify");
 
                     return Ok(article);
                 }
@@ -210,7 +210,7 @@ namespace ArticlesAPI.Controllers
 
                     await _articlesService.UpdateAsync(id, article);
 
-                    _rabbitMqPublisher.PublishMessage(exchange, JsonSerializer.Serialize(article), "update.notify");
+                    _rabbitMqPublisher.PublishMessage(Exchange, JsonSerializer.Serialize(article), "update.notify");
 
                     return Ok();
                 }
@@ -244,7 +244,7 @@ namespace ArticlesAPI.Controllers
                     {
                         article.LikeCount--;
                         await _articlesService.UpdateAsync(id, article);
-                        _rabbitMqPublisher.PublishMessage(exchange, JsonSerializer.Serialize(article), "update.notify");
+                        _rabbitMqPublisher.PublishMessage(Exchange, JsonSerializer.Serialize(article), "update.notify");
                     }
 
                     return Ok();
@@ -286,7 +286,7 @@ namespace ArticlesAPI.Controllers
 
                     await _articlesService.UpdateAsync(id, article);
 
-                    _rabbitMqPublisher.PublishMessage(exchange, JsonSerializer.Serialize(article), "update.notify");
+                    _rabbitMqPublisher.PublishMessage(Exchange, JsonSerializer.Serialize(article), "update.notify");
 
                     return Ok();
                 }
@@ -328,7 +328,7 @@ namespace ArticlesAPI.Controllers
 
                         await _articlesService.UpdateAsync(articleId, article);
 
-                        _rabbitMqPublisher.PublishMessage(exchange, JsonSerializer.Serialize(article), "update.notify");
+                        _rabbitMqPublisher.PublishMessage(Exchange, JsonSerializer.Serialize(article), "update.notify");
 
                         return NoContent();
                     }

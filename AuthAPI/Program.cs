@@ -1,5 +1,6 @@
 using AuthAPI.Data;
 using AuthAPI.Models;
+using AuthAPI.RabbitMq;
 using AuthAPI.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -33,6 +34,9 @@ builder.Services.AddControllers();
 
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<TokenService>();
+
+builder.Services.AddSingleton<IRabbitMqConnection, RabbitMqConnection>();
+builder.Services.AddScoped<IRabbitMqPublisher, RabbitMqPublisher>();
 
 var app = builder.Build();
 

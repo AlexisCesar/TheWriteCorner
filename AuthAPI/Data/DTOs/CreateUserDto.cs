@@ -6,10 +6,11 @@ namespace AuthAPI.Data.DTOs
     {
         [Required]
         public string Username { get; set; }
-        
+        [Required]
+        [DataType(DataType.EmailAddress)]
+        public string EmailAddress { get; set;}
         [Required]
         [DataType(DataType.Password)]
-
         public string Password { get; set; }
         [Required]
         [Compare("Password")]

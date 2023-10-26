@@ -44,8 +44,15 @@ namespace SendArticleNotification.RabbitMq
                 var routingKey = ea.RoutingKey;
                 Logger.Info($" [x] Received message in queue '{queueName}' with routingkey '{routingKey}'.");
 
-                var article = JsonSerializer.Deserialize<T>(message);
-                if(article != null ) callback(article);
+                try
+                {
+                    var messageContent = JsonSerializer.Deserialize<T>(message);
+                    if (messageContent != null) callback(messageContent);
+                } 
+                catch
+                {
+                    callback((T)(object)message);
+                }
 
                 channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
             };
