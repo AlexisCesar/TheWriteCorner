@@ -86,6 +86,18 @@ services:
         condition: service_healthy
     volumes:
       - ./UpdateArticlesFullTextSearch/logs:/app/logs
+  send_article_notification:
+    build: ./SendArticleNotification
+    container_name: send_article_notification
+    networks:
+      - messaging-network
+    stdin_open: true
+    tty: true
+    depends_on:
+      broker:
+        condition: service_healthy
+    volumes:
+      - ./SendArticleNotification/logs:/app/logs
   auth_db:
     image: mysql
     restart: always
