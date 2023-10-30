@@ -46,6 +46,7 @@ services:
     networks:
       - articles-management-network
       - messaging-network
+      - api-gateway
     volumes:
       - ./ArticlesAPI/logs:/app/logs
     depends_on:
@@ -107,6 +108,7 @@ services:
     networks:
       - auth-network
       - messaging-network
+      - api-gateway
     volumes:
       - ./AuthAPI/logs:/app/logs
     depends_on:
@@ -138,6 +140,13 @@ services:
       MYSQL_ROOT_PASSWORD: root
     networks:
       - notification-network
+  api_gateway:
+    build: ./ApiGateway
+    ports:
+      - '8080:80'
+    container_name: api_gateway
+    networks:
+      - api-gateway
 volumes:
   mongoManagement:
   mongoSearch:
@@ -154,4 +163,6 @@ networks:
   auth-network:
     driver: bridge
   notification-network:
+    driver: bridge
+  api-gateway:
     driver: bridge
