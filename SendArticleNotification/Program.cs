@@ -59,16 +59,15 @@ class Program
                         <head>
                             <meta http-equiv=""Content-Type"" content=""text/html; charset=utf-8"" />
                         </head>
-                        <div style=""background-color: ##f2ecda;"">
+                        <div style=""background-color:#f2f0eb;padding:.5rem;"">
                         <h2>Hey, you should check this article!</h2>
-                        <hr>
-                        <h3>{article.Title}</h3>
-                        <p>Published by: {article.Authors.First()} {((article.Authors.Count() > 1) ? "and others..." : "")}</p>
-                        <p>To check this article, click here!<p>
+                        <div style=""background-color:#000000;width:100%;height:2px;""></div>
+                        <h3>{{article.Title}}</h3>
+                        <p>Published by: {{article.Authors.First()}} {{((article.Authors.Count() > 1) ? ""and others..."" : """")}}</p>
+                        <p>To read this article, <a href="""" target=""_blank"">click here</a>!<p>
                         <br>
-                        <p>To stop receiving notifications, click here.<p>
-                        <br>
-                        <p>TheWriteCorner! 📝<p>
+                        <p>To stop receiving notifications, <a href="""" target=""_blank"">click here</a>.<p>
+                        <p>TheWriteCorner 📜🪶<p>
                         </div>
                     </html>",
                 });
