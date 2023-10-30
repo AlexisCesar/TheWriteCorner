@@ -21,3 +21,5 @@ tags
 # log files
 logs
 *.log
+
+.vscode/
