@@ -11,8 +11,8 @@ namespace SendArticleNotification.Data
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseMySql(
-                "server=notification_db;database=emails;user=root;password=root",
-                ServerVersion.AutoDetect("server=notification_db;database=emails;user=root;password=root")
+                "server=notification_db;database=articles_notification;user=root;password=root",
+                ServerVersion.AutoDetect("server=notification_db;database=articles_notification;user=root;password=root")
             );
         }
     }
