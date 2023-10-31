@@ -147,6 +147,8 @@ services:
     container_name: api_gateway
     networks:
       - api-gateway
+    depends_on:
+      - articles_api
 volumes:
   mongoManagement:
   mongoSearch:
