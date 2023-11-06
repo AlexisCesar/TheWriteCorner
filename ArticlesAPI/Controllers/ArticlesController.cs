@@ -166,9 +166,11 @@ namespace ArticlesAPI.Controllers
                     if (articleInDatabase == null) return NotFound("An article with this ID was not found.");
 
                     var articleToUpdate = _mapper.Map<Article>(article);
+                    articleToUpdate.Id = id;
+                    articleToUpdate.LikeCount = articleInDatabase.LikeCount;
+                    articleToUpdate.Comments = articleInDatabase.Comments;
 
                     var validationResult = _articleValidator.Validate(articleToUpdate);
-
                     if (!validationResult.IsValid)
                     {
                         return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
@@ -176,9 +178,9 @@ namespace ArticlesAPI.Controllers
 
                     await _articlesService.UpdateAsync(id, articleToUpdate);
 
-                    _rabbitMqPublisher.PublishMessage(Exchange, JsonSerializer.Serialize(article), "update.notify");
+                    _rabbitMqPublisher.PublishMessage(Exchange, JsonSerializer.Serialize(articleToUpdate), "update.notify");
 
-                    return Ok(article);
+                    return Ok(articleToUpdate);
                 }
                 catch (Exception ex)
                 {
