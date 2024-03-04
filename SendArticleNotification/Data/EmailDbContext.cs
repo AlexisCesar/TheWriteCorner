@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.Contracts;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using SendArticleNotification.Models;
 
 namespace SendArticleNotification.Data
