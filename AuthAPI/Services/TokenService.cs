@@ -24,7 +24,7 @@ namespace AuthAPI.Services
                 new Claim("loginTimestamp", DateTime.UtcNow.ToString())
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("9EkdX4IwbqZPScUzFNZpB7OIJkMlWJf9ceYfbZgHqt8=\r\n"));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("9EkdX4IwbqZPScUzFNZpB7OIJkMlWJf9ceYfbZgHqt8="));
 
             var signingCredentials =
                 new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
