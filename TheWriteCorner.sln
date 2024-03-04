@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.6.33829.357
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ArticlesAPI", "ArticlesAPI\ArticlesAPI.csproj", "{3FDA915C-55B4-4669-B004-EB17CAFAEC45}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ArticlesSearchAPI", "ArticlesSearchAPI\ArticlesSearchAPI.csproj", "{DFF2B323-0FE7-474D-ADF3-C1489D325C4C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SendArticleNotification", "SendArticleNotification\SendArticleNotification.csproj", "{D83ED0DE-382C-4E81-9606-838225B446A3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuthAPI", "AuthAPI\AuthAPI.csproj", "{CC4DA5E9-C389-47DC-BFB8-F164AE5D057B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UpdateArticlesFullTextSearch", "UpdateArticlesFullTextSearch\UpdateArticlesFullTextSearch.csproj", "{4F5978E4-FBF3-4AA7-9E4D-19EF7B6473B8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nginx", "Nginx", "{2131B5E0-FFD2-4AE5-8C42-8747C040C7EE}"
+	ProjectSection(SolutionItems) = preProject
+		ApiGateway\config_files\default.conf = ApiGateway\config_files\default.conf
+		ApiGateway\Dockerfile = ApiGateway\Dockerfile
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3FDA915C-55B4-4669-B004-EB17CAFAEC45}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3FDA915C-55B4-4669-B004-EB17CAFAEC45}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3FDA915C-55B4-4669-B004-EB17CAFAEC45}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3FDA915C-55B4-4669-B004-EB17CAFAEC45}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DFF2B323-0FE7-474D-ADF3-C1489D325C4C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DFF2B323-0FE7-474D-ADF3-C1489D325C4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DFF2B323-0FE7-474D-ADF3-C1489D325C4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DFF2B323-0FE7-474D-ADF3-C1489D325C4C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D83ED0DE-382C-4E81-9606-838225B446A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D83ED0DE-382C-4E81-9606-838225B446A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D83ED0DE-382C-4E81-9606-838225B446A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D83ED0DE-382C-4E81-9606-838225B446A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CC4DA5E9-C389-47DC-BFB8-F164AE5D057B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC4DA5E9-C389-47DC-BFB8-F164AE5D057B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC4DA5E9-C389-47DC-BFB8-F164AE5D057B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC4DA5E9-C389-47DC-BFB8-F164AE5D057B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4F5978E4-FBF3-4AA7-9E4D-19EF7B6473B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F5978E4-FBF3-4AA7-9E4D-19EF7B6473B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F5978E4-FBF3-4AA7-9E4D-19EF7B6473B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F5978E4-FBF3-4AA7-9E4D-19EF7B6473B8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2B48BBD9-1699-44C5-A2F4-457E1D48EAD7}
+	EndGlobalSection
+EndGlobal
