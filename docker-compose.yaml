@@ -16,8 +16,6 @@ services:
     volumes:
       - mongoManagement:/data/db
       - ./init-articles-management.js:/docker-entrypoint-initdb.d/init-articles-management.js
-    ports:
-      - '27018:27017' 
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: Database2023
@@ -30,8 +28,6 @@ services:
     volumes:
       - mongoSearch:/data/db
       - ./init-articles-search.js:/docker-entrypoint-initdb.d/init-articles-search.js
-    ports:
-      - '27019:27017' 
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: Database2023
@@ -40,8 +36,6 @@ services:
       - articles-search-network
   articles_api:
     build: ./ArticlesAPI
-    ports:
-      - '5556:80'
     container_name: articles_api
     networks:
       - articles-management-network
@@ -54,8 +48,6 @@ services:
         condition: service_healthy  
   articles_search:
     build: ./ArticlesSearchAPI
-    ports:
-      - '7776:80'
     container_name: articles_search
     networks:
       - articles-search-network
@@ -63,10 +55,9 @@ services:
       - ./ArticlesSearchAPI/logs:/app/logs
   broker:
     image: rabbitmq:3.11-management
-    ports:
-      - 5672:5672
-      - 15672:15672
     container_name: articles_broker
+    ports:
+      - 15672:15672
     healthcheck:
         test: rabbitmq-diagnostics -q ping
         interval: 30s
@@ -90,8 +81,6 @@ services:
   auth_db:
     image: mysql
     restart: always
-    ports:
-      - '3309:3306'
     container_name: auth_db
     volumes:
       - authdb:/var/lib/mysql
@@ -100,10 +89,12 @@ services:
       MYSQL_ROOT_PASSWORD: root
     networks:
       - auth-network
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 10s
+      retries: 3
   auth_api:
     build: ./AuthAPI
-    ports:
-      - '4442:80'
     container_name: auth_api
     networks:
       - auth-network
@@ -112,8 +103,10 @@ services:
     volumes:
       - ./AuthAPI/logs:/app/logs
     depends_on:
-      - auth_db
-      - broker
+      auth_db:
+        condition: service_healthy
+      broker:
+        condition: service_healthy
   send_article_notification:
     build: ./SendArticleNotification
     container_name: send_article_notification
@@ -125,13 +118,13 @@ services:
     depends_on:
       broker:
         condition: service_healthy
+      notification_db:
+        condition: service_healthy
     volumes:
       - ./SendArticleNotification/logs:/app/logs
   notification_db:
     image: mysql
     restart: always
-    ports:
-      - '3308:3306'
     container_name: notification_db
     volumes:
       - notificationdb:/var/lib/mysql
@@ -140,6 +133,10 @@ services:
       MYSQL_ROOT_PASSWORD: root
     networks:
       - notification-network
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 10s
+      retries: 3
   api_gateway:
     build: ./ApiGateway
     ports:
@@ -149,6 +146,8 @@ services:
       - api-gateway
     depends_on:
       - articles_api
+      - auth_api
+      - articles_search
 volumes:
   mongoManagement:
   mongoSearch:
