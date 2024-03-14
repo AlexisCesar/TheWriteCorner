@@ -51,6 +51,7 @@ services:
     container_name: articles_search
     networks:
       - articles-search-network
+      - api-gateway
     volumes:
       - ./ArticlesSearchAPI/logs:/app/logs
   broker:
