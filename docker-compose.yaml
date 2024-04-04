@@ -54,6 +54,12 @@ services:
       - api-gateway
     volumes:
       - ./ArticlesSearchAPI/logs:/app/logs
+    healthcheck:
+      test: curl --fail http://localhost:80 || exit 1
+      interval: 20s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
   broker:
     image: rabbitmq:3.11-management
     container_name: articles_broker
