@@ -2,6 +2,7 @@ using System.Text.Json;
 using AuthAPI.Data.DTOs;
 using AuthAPI.RabbitMq;
 using AuthAPI.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AuthAPI.Controllers
@@ -12,14 +13,14 @@ namespace AuthAPI.Controllers
     {
         private readonly ILogger<UsersController> _logger;
         private readonly UserService _userService;
-        private readonly IRabbitMqPublisher _rabbitMqPublisher;
+        //private readonly IRabbitMqPublisher _rabbitMqPublisher;
         private readonly string Exchange = "usersOperations";
 
-        public UsersController(ILogger<UsersController> logger, UserService userService, IRabbitMqPublisher rabbitMqPublisher)
+        public UsersController(ILogger<UsersController> logger, UserService userService/*, IRabbitMqPublisher rabbitMqPublisher*/)
         {
             _logger = logger;
             _userService = userService;
-            _rabbitMqPublisher = rabbitMqPublisher;
+            //_rabbitMqPublisher = rabbitMqPublisher;
         }
 
         [HttpPost("register")]
@@ -27,7 +28,7 @@ namespace AuthAPI.Controllers
              (CreateUserDto dto)
         {
             await _userService.CadastraUsuario(dto);
-            _rabbitMqPublisher.PublishMessage(Exchange, dto.EmailAddress, "email.registered");
+            //_rabbitMqPublisher.PublishMessage(Exchange, dto.EmailAddress, "email.registered");
 
             return Ok("User registered!");
 
@@ -38,6 +39,19 @@ namespace AuthAPI.Controllers
         {
             var token = await _userService.Login(dto);
             return Ok(token);
+        }
+
+        [HttpGet("test2")]
+        [Authorize("Role")]
+        public IActionResult ValidateToken()
+        {
+            return Ok("Authorized.");
+        }
+
+        [HttpGet("test3")]
+        public IActionResult ValidateTokenTest()
+        {
+            return Ok("Authorized.");
         }
     }
 }

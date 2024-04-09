@@ -21,7 +21,8 @@ namespace AuthAPI.Services
             {
                 new Claim("username", usuario.UserName),
                 new Claim("id", usuario.Id),     
-                new Claim("loginTimestamp", DateTime.UtcNow.ToString())
+                new Claim("loginTimestamp", DateTime.UtcNow.ToString()),
+                new Claim("role", "defaultUser")
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("9EkdX4IwbqZPScUzFNZpB7OIJkMlWJf9ceYfbZgHqt8="));
