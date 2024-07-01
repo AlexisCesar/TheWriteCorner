@@ -19,6 +19,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nginx", "Nginx", "{2131B5E0
 		ApiGateway\Dockerfile = ApiGateway\Dockerfile
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{97FBCBDC-7AC6-486B-AB49-F110E2DE0884}"
+	ProjectSection(SolutionItems) = preProject
+		docker-compose-dev.yaml = docker-compose-dev.yaml
+		docker-compose.yaml = docker-compose.yaml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

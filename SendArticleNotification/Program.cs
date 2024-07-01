@@ -36,6 +36,7 @@ class Program
             UseSSL = bool.TryParse(emailSettingsConfig["UseSSL"], out bool y) ? y : false,
         };
 
+
         var emailService = new EmailService(emailSettings);
         var emailDbContext = new EmailDbContext();
         if (emailDbContext.Database.GetPendingMigrations().Any())
@@ -49,7 +50,8 @@ class Program
 
             await emailDbContext.Emails.ForEachAsync((email) =>
             {
-                emailService.SendEmail(new EmailData()
+                logger.Info($"Notifying {email.EmailAddress}...");
+                var res = emailService.SendEmail(new EmailData()
                 {
                     EmailToId = email.EmailAddress,
                     EmailToName = "Dear Reader",
@@ -71,6 +73,8 @@ class Program
                         </div>
                     </html>",
                 });
+
+                logger.Info("Email sent: " + res);
             });
 
         });

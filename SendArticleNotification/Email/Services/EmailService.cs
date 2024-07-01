@@ -1,4 +1,5 @@
-﻿using MailKit.Net.Smtp;
+﻿using log4net;
+using MailKit.Net.Smtp;
 using MailKit.Security;
 using MimeKit;
 
@@ -10,6 +11,8 @@ namespace SendArticleNotification.Email.Services
     }
     public class EmailService : IEmailService
     {
+        private ILog Logger => LogManager.GetLogger(nameof(EmailService));
+
         EmailSettings _emailSettings = null;
         public EmailService(EmailSettings options)
         {
@@ -45,7 +48,7 @@ namespace SendArticleNotification.Email.Services
             }
             catch (Exception ex)
             {
-                //Log Exception Details
+                Logger.Error(ex);
                 return false;
             }
         }
